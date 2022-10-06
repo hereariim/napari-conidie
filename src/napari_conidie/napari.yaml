@@ -2,20 +2,22 @@ name: napari-conidie
 display_name: Conidie
 contributions:
   commands:
-    - id: napari-conidie.make_qwidget
-      python_name: napari_conidie._widget:ExampleQWidget
-      title: Make example QWidget
-    - id: napari-conidie.make_magic_widget
-      python_name: napari_conidie._widget:example_magic_widget
-      title: Make example magic widget
-    - id: napari-conidie.make_func_widget
-      python_name: napari_conidie._widget:example_function_widget
-      title: Make example function widget
+    - id: napari-conidie.segmentation
+      title: Say hello, world!
+      python_name: napari_conidie._script:process_function_segmentation
+
+    - id: napari-conidie.save_label
+      title: Say hello, world!
+      python_name: napari_conidie._script:save_modification
+
+    - id: napari-conidie.table_csv
+      title: Say hello, world!
+      python_name: napari_conidie._script:quantitative_data_for_all
+  
   widgets:
-    - command: napari-conidie.make_qwidget
-      display_name: Example QWidget
-    - command: napari-conidie.make_magic_widget
-      display_name: Example Magic Widget
-    - command: napari-conidie.make_func_widget
-      autogenerate: true
-      display_name: Example Function Widget
+    - command: napari-conidie.segmentation  # note, same as command.id above
+      display_name: Segmentation
+    - command: napari-conidie.save_label  # note, same as command.id above
+      display_name: Savee label
+    - command: napari-conidie.table_csv  # note, same as command.id above
+      display_name: Get data
