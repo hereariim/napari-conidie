@@ -239,7 +239,7 @@ def table_to_widget(table: dict) -> QWidget:
                     imsave(os.path.join(un_chemin,ix), img_as_ubyte(data_label1))
         
         filename, _ = QFileDialog.getSaveFileName(save_images_button, "Save as csv...", ".", "*.zip")
-        shutil.make_archive(filename,format="zip",root_dir=folder_to_zip)
+        shutil.make_archive(filename,root_dir=folder_to_zip)
         show_info('Compressed file done')
 
     widget = QWidget()
