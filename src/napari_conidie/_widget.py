@@ -1,4 +1,3 @@
-from this import d
 # from tkinter import Image
 
 import cv2
