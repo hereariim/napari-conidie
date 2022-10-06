@@ -1,6 +1,5 @@
 from this import d
 from tkinter import Image
-from tkinter.ttk import Progressbar
 
 import cv2
 
@@ -9,8 +8,7 @@ import pathlib
 import tempfile
 from zipfile import ZipFile
 import os
-from torch import _fake_quantize_learnable_per_tensor_affine
-import conidie.path as paths
+import napari_conidie.path as paths
 
 import re
 import PIL
@@ -21,8 +19,6 @@ from pandas import DataFrame
 import shutil
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
-from fileinput import filename
-from glob import glob
 
 from os import listdir,makedirs
 from os.path import isfile, join
