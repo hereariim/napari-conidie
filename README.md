@@ -21,18 +21,17 @@ and review the napari docs for plugin developers:
 https://napari.org/stable/plugins/index.html
 -->
 
+This module is currently being developed for public deployment. Currently, this module is limited to private use.
+
 ## Installation
 
-You can install `napari-conidie` via [pip]:
+Instructions for installing the module:
 
-    pip install napari-conidie
-
-
-
-To install latest development version :
-
-    pip install git+https://github.com/hereariim/napari-conidie.git
-
+- Download in zip format on Github
+- In the script _widget.py, change the path ilastik at line 69 of the function subprocess
+- Move and drag the napari-conidie folder to built-in napari
+- Close and launch napari
+- Find the napari-conidie plugin in the plugin pane
 
 ## Contributing
 
