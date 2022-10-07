@@ -1,7 +1,5 @@
 # from tkinter import Image
 
-import cv2
-
 import subprocess
 import pathlib
 import tempfile
