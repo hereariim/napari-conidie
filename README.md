@@ -21,17 +21,21 @@ and review the napari docs for plugin developers:
 https://napari.org/stable/plugins/index.html
 -->
 
-This module is currently being developed for public deployment. Currently, this module is limited to private use.
+This plugin is a use case for obtaining conidia and hyphae surface from images. This plugin is a private tool dedicated exclusively to the work of the QUASAV team.
 
 ## Installation
 
-Instructions for installing the module:
+This private tool cannot be found in the built-in napari. The installation therefore follows two steps:
 
-- Download in zip format on Github
-- In the script _widget.py, change the path ilastik at line 69 of the function subprocess
-- Move and drag the napari-conidie folder to built-in napari
-- Close and launch napari
-- Find the napari-conidie plugin in the plugin pane
+1 - Install latest development version :
+
+    git clone https://github.com/hereariim/napari-conidie.git
+
+Or:
+
+    Download napari-conidie zip file
+
+2 - Drag and drop napari-conidie file into the built-in
 
 ## Contributing
 
