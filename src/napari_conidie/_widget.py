@@ -64,9 +64,9 @@ def function_central(filepath):
     donner = '--raw_data="'+path_image+'"'
     output_dir = tempfile.TemporaryDirectory()
     recevoir = '--output_filename_format="'+os.path.join(output_dir.name,path_image.split('/')[-1][:-4])+'_result_type.jpg"'
-    projet_path = '--project="'+os.path.join(paths.get_models_dir(),'TER-data_NEW.ilp')+'"'
+    projet_path = '--project="'+os.path.join(paths.get_models_dir(),'NEW_RETRAIN.ilp')+'"'
     
-    subprocess.run(["C:/Program Files/ilastik-1.3.3post3/ilastik.exe",
+    subprocess.run(["C:/Program Files/ilastik-1.4.0rc5/ilastik.exe",
                     '--headless',
                     projet_path,
                     '--export_source=Simple Segmentation',
@@ -94,17 +94,22 @@ def function_central(filepath):
     image=np.array(img)
 
     
-    thresholds = threshold_multiotsu(np.array(gray_img),nbins=3)    
+    # thresholds = threshold_multiotsu(np.array(gray_img),nbins=3)    
     # Using the threshold values, we generate the three regions.
-    region = np.digitize(np.array(gray_img), bins=thresholds)
+
+    region = np.copy(image)
+    print(Counter(region.flatten()))
     print("Region")
     n,m=np.shape(region)
-    mk_1=np.where(region==1)
-    mk_2=np.where(region==2)
+    # mk_1=np.where(region==1)
+    # mk_2=np.where(region==2)
+    # mk_0=np.where(region==0)
+    mk_1=np.where(region==170)
+    mk_2=np.where(region==85)
     mk_0=np.where(region==0)
     region[mk_1]=0
-    region[mk_0]=1
-    region[mk_2]=0    
+    region[mk_2]=0  
+    region[mk_0]=1  
 
     boucle=True
 
@@ -174,7 +179,11 @@ def function_central(filepath):
     ##########################
     
     data = np.array(cut)
-    tache=np.where(data==255)
+    # tache=np.where(data==255)
+    # condide=np.where(data==85)
+    # hyphe=np.where(data==170)
+    print(Counter(data.flatten()))
+    tache=np.where(data==0)
     condide=np.where(data==85)
     hyphe=np.where(data==170)
     data[tache]=0
@@ -235,10 +244,48 @@ def table_to_widget(table: dict) -> QWidget:
                     data_label1[condide]=255
                     
                     imsave(os.path.join(un_chemin,ix), img_as_ubyte(data_label1))
-        
+
+        path = folder_to_zip
+        print(folder_to_zip)
+        A = [os.path.join(path,ix) for ix in os.listdir(path)]
+
+        def get_directory_not_empty(A):
+            B = []
+            for ix in A:
+                directory = os.listdir(ix)
+                if len(directory)!=0:
+                    B.append(ix)
+                else:
+                    os.rmdir(ix)
+            return B
+
+        B = get_directory_not_empty(A)
+
+        path_output = os.path.join(path,'output')
+        path_color = os.path.join(path_output,'color')
+        path_segmentation = os.path.join(path_output,'segmentation')
+
+        if not os.path.exists(path_color):
+            os.makedirs(path_color)
+        if not os.path.exists(path_segmentation):
+            os.makedirs(path_segmentation)
+
+        for ix in B:
+            path_image = [os.path.join(ix,iy) for iy in os.listdir(ix)]
+            print(path_image)
+            for iy in path_image:
+                name_image = iy.split('\\')[-1]
+                if name_image.find('_result')==-1:
+                    shutil.move(iy, os.path.join(path_color,name_image)) 
+                else:
+                    shutil.move(iy, os.path.join(path_segmentation,name_image)) 
+      
         filename, _ = QFileDialog.getSaveFileName(save_images_button, "Save as csv...", ".")
-        shutil.make_archive(filename,format="zip",root_dir=folder_to_zip)
+        shutil.make_archive(filename,format="zip",root_dir=path_output)
+        # shutil.make_archive(filename,format="zip",root_dir=folder_to_zip)
         show_info('Compressed file done')
+
+
 
     widget = QWidget()
     widget.setWindowTitle("region properties")
