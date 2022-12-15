@@ -497,12 +497,9 @@ def save_modification(image_seg : napari.layers.Labels, image_raw : ImageData, n
     sousdossier = image_seg.name.split('_result')[0]
     nom_image = image_seg.name.split('xx')[1]
     os.remove(f'{zip_dir.name}\{sousdossier}\{image_seg}.png')
-    # imsave(f'{zip_dir.name}\{sousdossier}\{image_seg}.png', img_as_uint(data_label))
     imsave(f'{zip_dir.name}\{sousdossier}\{image_seg}.png', img_as_ubyte(data_label))
    
 
 @magic_factory(call_button="execute", layout="vertical")
 def quantitative_data_for_all(napari_viewer : Viewer):
-    """Add, subtracts, multiplies, or divides to image layers with equal shape."""
-    print("OK")
     return get_quantitative_data_all_for_csv(zip_dir.name,napari_viewer)
