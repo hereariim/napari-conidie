@@ -30,6 +30,7 @@ from skimage.io import imread, imshow, imread_collection, concatenate_images, im
 from skimage.measure import label, regionprops_table
 from skimage.transform import resize
 from skimage.filters import threshold_multiotsu
+from napari.utils.notifications import show_info
 
 import napari
 from napari import Viewer
@@ -66,7 +67,17 @@ def function_central(filepath):
     recevoir = '--output_filename_format="'+os.path.join(output_dir.name,path_image.split('/')[-1][:-4])+'_result_type.jpg"'
     projet_path = '--project="'+os.path.join(paths.get_models_dir(),'NEW_RETRAIN.ilp')+'"'
     
-    subprocess.run(["C:/Program Files/ilastik-1.4.0rc5/ilastik.exe",
+    check_version = [ix for ix in os.listdir('C:/Program Files') if ix.find('ilastik')!=-1]
+    if len(check_version)==0:
+        show_info('ILASTIK NOT INSTALLED')
+    else:
+        ilastik_version = check_version[0]
+        show_info('ILASTIK VERSION:'+ilastik_version)
+    
+        
+    path_to_run = os.path.join("C:/Program Files",os.path.join(ilastik_version,"ilastik.exe"))
+    
+    subprocess.run([path_to_run,
                     '--headless',
                     projet_path,
                     '--export_source=Simple Segmentation',
