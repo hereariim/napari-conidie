@@ -58,14 +58,15 @@ color_dict[1] = colors[1]
 
 zip_dir = tempfile.TemporaryDirectory()
 
-def function_central(filepath):
+def function_central(filepath,modelname):
     
     path_image = str(filepath).replace('\\','/')
   
     donner = '--raw_data="'+path_image+'"'
     output_dir = tempfile.TemporaryDirectory()
     recevoir = '--output_filename_format="'+os.path.join(output_dir.name,path_image.split('/')[-1][:-4])+'_result_type.jpg"'
-    projet_path = '--project="'+os.path.join(paths.get_models_dir(),'NEW_RETRAIN.ilp')+'"'
+    # projet_path = '--project="'+os.path.join(paths.get_models_dir(),'NEW_RETRAIN.ilp')+'"'
+    projet_path = '--project='+str(modelname).replace('\\','/')
     
     check_version = [ix for ix in os.listdir('C:/Program Files') if ix.find('ilastik')!=-1]
     if len(check_version)==0:
@@ -429,8 +430,8 @@ def get_quantitative_data_all_for_csv(dossier_des_images,napari_viewer):
     napari_viewer.window.add_dock_widget(dock_widget, area='right',name="Save")
     
     
-@magic_factory(call_button="Run segmentation",filename={"label": "Pick a file:"})
-def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.cwd()): 
+@magic_factory(call_button="Run segmentation",filename={"label": "Zip file (.zip):"},modelname={"label": "Ilastik model (.ilp):"})
+def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.cwd(),modelname=pathlib.Path.cwd()): 
     
     dico = {}
     with ZipFile(filename,'r') as zipObject:
@@ -444,7 +445,7 @@ def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.c
             temp_i_jpg = listOfFileNames[i].replace('/','xx')[:-4].replace(" ","")
             os.mkdir(zip_dir.name+'\\'+temp_i_jpg)
             shutil.move(zip_dir.name+'\\'+listOfFileNames[i].replace('/','\\'),zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i)
-            image_segm = function_central(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i)
+            image_segm = function_central(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,modelname)
             # imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_uint(image_segm))
             imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_ubyte(image_segm))
             dico[temp_i_jpg+'_result.png'] = image_segm
