@@ -75,7 +75,6 @@ def function_central(filepath,modelname):
         ilastik_version = check_version[0]
         show_info('ILASTIK VERSION:'+ilastik_version)
     
-        
     path_to_run = os.path.join("C:/Program Files",os.path.join(ilastik_version,"ilastik.exe"))
     
     subprocess.run([path_to_run,
