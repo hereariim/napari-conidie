@@ -43,23 +43,23 @@ Before using the plugin, you must have two data:
 ```
 └── Compressed file
     ├── Folder1
-    │   ├── img0_1.tif
-    │   ├── img0_2.tif
+    │   ├── img0_1.jpg
+    │   ├── img0_2.jpg
     │   ...
-    │   └── img0_n.tif
+    │   └── img0_n.jpg
     │ 
     ├── Folder2
-    │   ├── img1_1.tif
-    │   ├── img1_2.tif
+    │   ├── img1_1.jpg
+    │   ├── img1_2.jpg
     │   ...
-    │   └── img1_n.tif
+    │   └── img1_n.jpg
     ...
     │
     └──  Foldern
-        ├── imgn_1.tif
-        ├── imgn_2.tif
+        ├── imgn_1.jpg
+        ├── imgn_2.jpg
         ...
-        └── imgn_n.tif
+        └── imgn_n.jpg
 ```
 
 ## Plugin
