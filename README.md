@@ -31,11 +31,36 @@ This private tool cannot be found in the built-in napari. The installation there
 
     git clone https://github.com/hereariim/napari-conidie.git
 
-Or:
+## Getting started
 
-    Download napari-conidie zip file
+As prerequisite, user must have installed ilastik in its computer.
 
-2 - Drag and drop napari-conidie file into the built-in
+Before using the plugin, you must have two data:
+
+- The ilastik model
+- The compressed file contained your images structured as followed :
+
+```
+└── Compressed file
+    ├── Folder1
+    │   ├── img0_1.tif
+    │   ├── img0_2.tif
+    │   ...
+    │   └── img0_n.tif
+    │ 
+    ├── Folder2
+    │   ├── img1_1.tif
+    │   ├── img1_2.tif
+    │   ...
+    │   └── img1_n.tif
+    ...
+    │
+    └──  Foldern
+        ├── imgn_1.tif
+        ├── imgn_2.tif
+        ...
+        └── imgn_n.tif
+```
 
 ## Contributing
 
