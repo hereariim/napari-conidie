@@ -6,7 +6,8 @@ import tempfile
 from zipfile import ZipFile
 import os
 import napari_conidie.path as paths
-
+import napari_conidie.ilastik_search as il_sh
+import typing
 import re
 import PIL
 
@@ -46,10 +47,12 @@ from magicgui.widgets import Table
 from magicgui.tqdm import trange
 from qtpy.QtWidgets import QTableWidget, QTableWidgetItem, QGridLayout, QFileDialog, QListWidget, QHBoxLayout, QPushButton, QWidget
 from qtpy.QtCore import Qt
-
+import pandas as pd
 # from ilastik.experimental.api import from_project_file
 
+il_sh.ilastik_txt_search()
 
+iter_ = 0
 colormap = cu.label_colormap()
 colors = colormap.colors
 color_dict = {}
@@ -57,6 +60,7 @@ color_dict[0] = colors[0]
 color_dict[1] = colors[1]
 
 zip_dir = tempfile.TemporaryDirectory()
+os.mkdir(os.path.join(zip_dir.name,'data'))
 
 def function_central(filepath,modelname):
     
@@ -68,14 +72,16 @@ def function_central(filepath,modelname):
     # projet_path = '--project="'+os.path.join(paths.get_models_dir(),'NEW_RETRAIN.ilp')+'"'
     projet_path = '--project='+str(modelname).replace('\\','/')
     
-    check_version = [ix for ix in os.listdir('C:/Program Files') if ix.find('ilastik')!=-1]
-    if len(check_version)==0:
-        show_info('ILASTIK NOT INSTALLED')
-    else:
-        ilastik_version = check_version[0]
-        show_info('ILASTIK VERSION:'+ilastik_version)
-    
-    path_to_run = os.path.join("C:/Program Files",os.path.join(ilastik_version,"ilastik.exe"))
+    # check_version = [ix for ix in os.listdir('C:/Program Files') if ix.find('ilastik')!=-1]
+    # if len(check_version)==0:
+    #     show_info('ILASTIK NOT INSTALLED')
+    # else:
+    #     ilastik_version = check_version[0]
+    #     show_info('ILASTIK VERSION:'+ilastik_version)
+        
+    df = pd.read_csv(paths.get_ilastik_exe(),header=None)
+    path_to_run = df.iloc[0][0]
+    # path_to_run = os.path.join("C:/Program Files",os.path.join(ilastik_version,"ilastik.exe"))
     
     subprocess.run([path_to_run,
                     '--headless',
@@ -376,24 +382,42 @@ def quantitative_data_for_all(dictionnaire,napari_viewer):
     
     
     
-def get_quantitative_data_all_for_csv(dossier_des_images,napari_viewer):
+def get_quantitative_data_all_for_csv(dossier_des_images,napari_viewer,image_raw,image_seg):
+    print(image_raw.name)
+    dfl = pd.read_csv(zip_dir.name+'\\'+'data'+'\\'+image_raw.name+'.csv')
+    A_im = np.array(dfl["Image"])
+    A_sb = np.array(dfl["Folder"])
+    print("A_im",A_im)
+    print("A_sb",A_sb)
+    
+    n = len(image_raw.data.shape)
+    
+    dictionnaire = {}
+    if n==4:
+        msk_stack = image_seg.data
+        total_img,_,_,_ = image_raw.data.shape
+        for ix in range(total_img):
+            dictionnaire[ix]=msk_stack[ix,...]
+    else:
+        dictionnaire[0]=image_seg.data
+    
     A = [] 
     B = []
     C = []
     D = []
     E = []
     
-    dictionnaire = {}
+    # dictionnaire = {}
     
-    for ix in os.listdir(dossier_des_images):
-        chemin_dans_sousdossier = os.path.join(dossier_des_images,ix)
-        print(f'path to {ix} :',chemin_dans_sousdossier)
-        if len(os.listdir(chemin_dans_sousdossier))!=0:
-            for iy in os.listdir(chemin_dans_sousdossier):
-                if iy.find("result")!=-1:
-                    data_dico=imread(os.path.join(chemin_dans_sousdossier,iy))
-                    print("chemin sous dossier",os.path.join(chemin_dans_sousdossier,iy))
-                    dictionnaire[iy]=data_dico
+    # for ix in os.listdir(dossier_des_images):
+    #     chemin_dans_sousdossier = os.path.join(dossier_des_images,ix)
+    #     print(f'path to {ix} :',chemin_dans_sousdossier)
+    #     if len(os.listdir(chemin_dans_sousdossier))!=0:
+    #         for iy in os.listdir(chemin_dans_sousdossier):
+    #             if iy.find("result")!=-1:
+    #                 data_dico=imread(os.path.join(chemin_dans_sousdossier,iy))
+    #                 print("chemin sous dossier",os.path.join(chemin_dans_sousdossier,iy))
+    #                 dictionnaire[iy]=data_dico
 
     for ix in dictionnaire.keys():
         print('ix',ix)
@@ -413,9 +437,12 @@ def get_quantitative_data_all_for_csv(dossier_des_images,napari_viewer):
         minus=0
         for rg in regions:
             if len(rg.coords[:,0])>seuil:
-                name_xx = ix.split('xx')
-                A.append(name_xx[0])
-                B.append(name_xx[1][:-4])
+                # name_xx = ix.split('xx')
+                # A.append(name_xx[0])
+                # B.append(name_xx[1][:-4])
+    
+                A.append(A_sb[ix])
+                B.append(A_im[ix])
                 C.append(len(regions)-minus)
                 D.append(len(hyphe[0]))
                 E.append(len(connidie[0]))
@@ -428,11 +455,18 @@ def get_quantitative_data_all_for_csv(dossier_des_images,napari_viewer):
     dock_widget = table_to_widget(d)
     napari_viewer.window.add_dock_widget(dock_widget, area='right',name="Save")
     
-    
+
 @magic_factory(call_button="Run segmentation",filename={"label": "Zip file (.zip):"},modelname={"label": "Ilastik model (.ilp):"})
-def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.cwd(),modelname=pathlib.Path.cwd()): 
+def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.cwd(),modelname=pathlib.Path.cwd()) -> typing.List[napari.types.LayerDataTuple]:
+    global iter_
+    iter_+=1
     
     dico = {}
+    print(napari_viewer.add_image)
+    Mask_ = []
+    Imgs_ = []
+    A_folder = []
+    A_name = []
     with ZipFile(filename,'r') as zipObject:
     
         listOfFileNames = zipObject.namelist()
@@ -442,54 +476,70 @@ def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.c
             zipObject.extract(listOfFileNames[i],path=zip_dir.name)            
             temp_i = listOfFileNames[i].replace('/','xx').replace(" ","")       
             temp_i_jpg = listOfFileNames[i].replace('/','xx')[:-4].replace(" ","")
+            
+            folder_ = temp_i.split('xx')[0]
+            images_ = temp_i.split('xx')[1]
+            A_folder.append(folder_)
+            A_name.append(images_)            
             os.mkdir(zip_dir.name+'\\'+temp_i_jpg)
             shutil.move(zip_dir.name+'\\'+listOfFileNames[i].replace('/','\\'),zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i)
-            image_segm = function_central(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,modelname)
-            # imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_uint(image_segm))
-            imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_ubyte(image_segm))
-            dico[temp_i_jpg+'_result.png'] = image_segm
+            shutil.copy(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,zip_dir.name+'\\'+'data'+'\\'+temp_i)
             
-    print("Extraction done located into",zip_dir.name)
+            Imgs_.append(imread(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i))
+            image_segm = function_central(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,modelname)
+            Mask_.append(image_segm)
+            # imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_uint(image_segm))
+            # imsave(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i_jpg+'_result.png', img_as_ubyte(image_segm))
+            # imsave(os.path.join(zip_dir.name,'data',temp_i_jpg+'_result.png'), img_as_ubyte(image_segm))
+            # dico[temp_i_jpg+'_result.png'] = image_segm
+    
+    # napari_viewer.add_image(np.array(Imgs_))
+    # napari_viewer.add_labels(np.array(Mask_))
+    dfd = pd.DataFrame({"Folder":A_folder,"Image":A_name})
+    dfd.to_csv(zip_dir.name+'\\'+'data'+'\\'+'Image '+str(iter_)+'.csv',index=False)
+    return [(np.array(Imgs_),{"name":"Image "+str(iter_)},"Image"),(np.array(Mask_),{"name":"Mask"},"Labels")]
+            
+    # print("Extraction done located into",zip_dir.name)
         
-    names = []
-    for ix in os.listdir(zip_dir.name):
-        if len(os.listdir(os.path.join(zip_dir.name,ix)))!=0:
-            names.append(ix)
+    # names = []
+    # for ix in os.listdir(zip_dir.name):
+    #     if len(os.listdir(os.path.join(zip_dir.name,ix)))!=0:
+    #         names.append(ix)
 
-    def open_name(item):
+    # def open_name(item):
         
-        name = item.text()
-        name_folder = name[:-4]
+    #     name = item.text()
+    #     name_folder = name[:-4]
         
-        print('Loading', name, '...')
+    #     print('Loading', name, '...')
 
-        napari_viewer.layers.select_all()
-        napari_viewer.layers.remove_selected()    
-        fname = f'{zip_dir.name}\{name}'
-        for fname_i in os.listdir(fname):
-            if fname_i.find('result')!=-1:
-                data_label = imread(f'{fname}\{fname_i}')
-                data_label1 = np.array(data_label)
-                print("Image_count :",Counter(data_label.flatten()))
-                tache=np.where(data_label1==0)
-                condide=np.where(data_label1==257)
-                hyphe=np.where(data_label1==514)
-                data_label1[tache]=0
-                data_label1[hyphe]=2
-                data_label1[condide]=1                
-                napari_viewer.add_labels(data_label1,name=f'{fname_i[:-4]}')
-            else:
-                napari_viewer.add_image(imread(f'{fname}\{fname_i}'),name=f'{fname_i[:-4]}')
+    #     napari_viewer.layers.select_all()
+    #     napari_viewer.layers.remove_selected()    
+    #     fname = f'{zip_dir.name}\{name}'
+    #     for fname_i in os.listdir(fname):
+    #         if fname_i.find('result')!=-1:
+    #             data_label = imread(f'{fname}\{fname_i}')
+    #             data_label1 = np.array(data_label)
+    #             print("Image_count :",Counter(data_label.flatten()))
+    #             tache=np.where(data_label1==0)
+    #             condide=np.where(data_label1==257)
+    #             hyphe=np.where(data_label1==514)
+    #             data_label1[tache]=0
+    #             data_label1[hyphe]=2
+    #             data_label1[condide]=1                
+    #             napari_viewer.add_labels(data_label1,name=f'{fname_i[:-4]}')
+    #         else:
+    #             napari_viewer.add_image(imread(f'{fname}\{fname_i}'),name=f'{fname_i[:-4]}')
 
-        print('... done.')
+    #     print('... done.')
 
 
-    list_widget = QListWidget()
-    for n in names:
-        list_widget.addItem(n)    
-    list_widget.currentItemChanged.connect(open_name)
-    napari_viewer.window.add_dock_widget([list_widget], area='right',name="Images")
-    list_widget.setCurrentRow(0)
+    # list_widget = QListWidget()
+    # for n in names:
+    #     list_widget.addItem(n)    
+    # list_widget.currentItemChanged.connect(open_name)
+    # napari_viewer.window.add_dock_widget([list_widget], area='right',name="Images")
+    # list_widget.setCurrentRow(0)
     
 @magic_factory(call_button="save modification", layout="vertical")
 def save_modification(image_seg : napari.layers.Labels, image_raw : ImageData, napari_viewer : Viewer):
@@ -501,5 +551,5 @@ def save_modification(image_seg : napari.layers.Labels, image_raw : ImageData, n
    
 
 @magic_factory(call_button="execute", layout="vertical")
-def quantitative_data_for_all(napari_viewer : Viewer):
-    return get_quantitative_data_all_for_csv(zip_dir.name,napari_viewer)
+def quantitative_data_for_all(napari_viewer : Viewer,image_seg : napari.layers.Labels, image_raw : napari.layers.Image):
+    return get_quantitative_data_all_for_csv(zip_dir.name,napari_viewer,image_raw,image_seg)
