@@ -64,7 +64,7 @@ Before using the plugin, you must have two data:
 
 ## Plugin
 
-![here](https://github.com/hereariim/napari-conidie/assets/93375163/471090e0-2ad9-4cc3-99f8-4faa4413560b)
+![here](https://github.com/hereariim/napari-conidie/assets/93375163/07cf6bc3-3d55-4ae1-94ac-8e8b33193963)
 
 ## Contributing
 
