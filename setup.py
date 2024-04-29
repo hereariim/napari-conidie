@@ -7,7 +7,7 @@ setup(
     author_email="herearii.metuarea@gmail.com",
     name='napari-conidie', 
     description='A segmentation tool to get conidie and hyphe',  
-    version="1.0.0",    
+    version="1.0.1",    
     long_description=long_description, 
     long_description_content_type="text/markdown",  
     url='https://github.com/hereariim/napari-conidie', 
