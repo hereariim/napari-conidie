@@ -1,4 +1,4 @@
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 from ._widget import process_function_segmentation,quantitative_data_for_all
 
 __all__ = (
