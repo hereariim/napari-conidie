@@ -62,6 +62,10 @@ Before using the plugin, you must have two data:
         └── imgn_n.tif
 ```
 
+## Plugin
+
+![here](https://github.com/hereariim/napari-conidie/assets/93375163/471090e0-2ad9-4cc3-99f8-4faa4413560b)
+
 ## Contributing
 
 Contributions are very welcome. Tests can be run with [tox], please ensure
