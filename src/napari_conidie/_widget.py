@@ -314,71 +314,71 @@ def table_to_widget(table: dict) -> QWidget:
 
     return widget
 
-def get_quantitative_data(image, napari_viewer):
-    img=image
-    seuil=25
+# def get_quantitative_data(image, napari_viewer):
+#     img=image
+#     seuil=25
 
-    connidie=np.where(img==1)
-    hyphe=np.where(img==2)
-    img[connidie]=0
+#     connidie=np.where(img==1)
+#     hyphe=np.where(img==2)
+#     img[connidie]=0
 
-    labels_mask = measure.label(img, background=0) # Solution venant de stackoverflow, Mesure les differents elements                       
-    regions = measure.regionprops(labels_mask)
-    regions.sort(key=lambda x: x.area, reverse=False) 
+#     labels_mask = measure.label(img, background=0) # Solution venant de stackoverflow, Mesure les differents elements                       
+#     regions = measure.regionprops(labels_mask)
+#     regions.sort(key=lambda x: x.area, reverse=False) 
 
-    print(">",len(hyphe[0]))
-    print(">",len(connidie[0]))
+#     print(">",len(hyphe[0]))
+#     print(">",len(connidie[0]))
     
-    minus=0
-    for rg in regions:
-        if len(rg.coords[:,0])>seuil:
-            print(">",len(regions)-minus)
-            break
-        else: 
-            minus+=1    
-    d = {'nombre dhyphes': [len(regions)-minus], 'hyphe': [len(hyphe[0])], 'connidie': [len(connidie[0])]}
+#     minus=0
+#     for rg in regions:
+#         if len(rg.coords[:,0])>seuil:
+#             print(">",len(regions)-minus)
+#             break
+#         else: 
+#             minus+=1    
+#     d = {'nombre dhyphes': [len(regions)-minus], 'hyphe': [len(hyphe[0])], 'connidie': [len(connidie[0])]}
 
-    dock_widget = table_to_widget(d)
-    napari_viewer.window.add_dock_widget(dock_widget, area='right')
+#     dock_widget = table_to_widget(d)
+#     napari_viewer.window.add_dock_widget(dock_widget, area='right')
     
-def quantitative_data_for_all(dictionnaire,napari_viewer):
-    A = [] #sous dossier
-    B = [] #nom image
-    C = []
-    D = []
-    E = []
-    for ix in dictionnaire.keys():
-        img=dictionnaire[ix]
-        seuil=25
+# def quantitative_data_for_all(dictionnaire,napari_viewer):
+#     A = [] #sous dossier
+#     B = [] #nom image
+#     C = []
+#     D = []
+#     E = []
+#     for ix in dictionnaire.keys():
+#         img=dictionnaire[ix]
+#         seuil=25
 
-        connidie=np.where(img==1)
-        hyphe=np.where(img==2)
-        img[connidie]=0
+#         connidie=np.where(img==1)
+#         hyphe=np.where(img==2)
+#         img[connidie]=0
 
-        labels_mask = measure.label(img, background=0) # Solution venant de stackoverflow, Mesure les differents elements                       
-        regions = measure.regionprops(labels_mask)
-        regions.sort(key=lambda x: x.area, reverse=False) 
+#         labels_mask = measure.label(img, background=0) # Solution venant de stackoverflow, Mesure les differents elements                       
+#         regions = measure.regionprops(labels_mask)
+#         regions.sort(key=lambda x: x.area, reverse=False) 
 
-        print(">",len(hyphe[0]))
-        print(">",len(connidie[0]))
+#         print(">",len(hyphe[0]))
+#         print(">",len(connidie[0]))
         
-        minus=0
-        for rg in regions:
-            if len(rg.coords[:,0])>seuil:
-                print(">",len(regions)-minus)
-                name_xx = ix.split('xx')
-                A.append(name_xx[0])
-                B.append(name_xx[1])
-                C.append(len(regions)-minus)
-                D.append(len(hyphe[0]))
-                E.append(len(connidie[0]))
-                break
-            else: 
-                minus+=1    
+#         minus=0
+#         for rg in regions:
+#             if len(rg.coords[:,0])>seuil:
+#                 print(">",len(regions)-minus)
+#                 name_xx = ix.split('xx')
+#                 A.append(name_xx[0])
+#                 B.append(name_xx[1])
+#                 C.append(len(regions)-minus)
+#                 D.append(len(hyphe[0]))
+#                 E.append(len(connidie[0]))
+#                 break
+#             else: 
+#                 minus+=1    
 
-    d = {'sous dossier':A,'nom image':B,'nombre dhyphes': C, 'hyphe': D, 'connidie': E}
-    dock_widget = table_to_widget(d)
-    napari_viewer.window.add_dock_widget(dock_widget, area='right')
+#     d = {'sous dossier':A,'nom image':B,'nombre dhyphes': C, 'hyphe': D, 'connidie': E}
+#     dock_widget = table_to_widget(d)
+#     napari_viewer.window.add_dock_widget(dock_widget, area='right')
     
     
     
@@ -482,8 +482,9 @@ def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.c
             A_folder.append(folder_)
             A_name.append(images_)            
             os.mkdir(zip_dir.name+'\\'+temp_i_jpg)
+            print(listOfFileNames[i].replace('/','\\'))
             shutil.move(zip_dir.name+'\\'+listOfFileNames[i].replace('/','\\'),zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i)
-            shutil.copy(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,zip_dir.name+'\\'+'data'+'\\'+temp_i)
+            # shutil.copy(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,zip_dir.name+'\\'+'data'+'\\'+temp_i)
             
             Imgs_.append(imread(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i))
             image_segm = function_central(zip_dir.name+'\\'+temp_i_jpg+'\\'+temp_i,modelname)
@@ -541,13 +542,13 @@ def process_function_segmentation(napari_viewer : Viewer,filename=pathlib.Path.c
     # napari_viewer.window.add_dock_widget([list_widget], area='right',name="Images")
     # list_widget.setCurrentRow(0)
     
-@magic_factory(call_button="save modification", layout="vertical")
-def save_modification(image_seg : napari.layers.Labels, image_raw : ImageData, napari_viewer : Viewer):
-    data_label = image_seg.data
-    sousdossier = image_seg.name.split('_result')[0]
-    nom_image = image_seg.name.split('xx')[1]
-    os.remove(f'{zip_dir.name}\{sousdossier}\{image_seg}.png')
-    imsave(f'{zip_dir.name}\{sousdossier}\{image_seg}.png', img_as_ubyte(data_label))
+# @magic_factory(call_button="save modification", layout="vertical")
+# def save_modification(image_seg : napari.layers.Labels, image_raw : ImageData, napari_viewer : Viewer):
+#     data_label = image_seg.data
+#     sousdossier = image_seg.name.split('_result')[0]
+#     nom_image = image_seg.name.split('xx')[1]
+#     os.remove(f'{zip_dir.name}\{sousdossier}\{image_seg}.png')
+#     imsave(f'{zip_dir.name}\{sousdossier}\{image_seg}.png', img_as_ubyte(data_label))
    
 
 @magic_factory(call_button="execute", layout="vertical")
