@@ -14,9 +14,7 @@ import PIL
 import h5py
 from collections import Counter
 from pandas import DataFrame
-import shutil
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
+import shutil 
 
 from os import listdir,makedirs
 from os.path import isfile, join
